@@ -12,8 +12,8 @@ from Methods import smoothing
 from Methods import combine
 from Methods import create_stego_audio
 
-audio = '2'
-payload = '11'
+audio = '1'
+payload = '9'
 audio_file = 'dataset/Audio/data'+audio+'_mono.wav'
 payload_file = 'dataset/Payload/payload'+payload+'.txt'
 stego_audio = 'stego_audio/stego_audio'+audio+'_payload'+payload+'/stegoaudio.wav'
@@ -35,3 +35,4 @@ smoothed = smoothing(embedded, interpolated_sample,bit)
 #create output
 stego_data = combine(original_sample, smoothed, interpolated_sample)
 create_stego_audio(stego_data, stego_audio)
+print(stego_audio)

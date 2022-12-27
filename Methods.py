@@ -67,24 +67,31 @@ def embedding(payload_decimal, interpolated_sample):
     return embedded
 
 def smoothing(embedded_sample, interpolated_sample, bit):
-    average_bit = 4 # aslinya 6
+    average_bit = 2 # aslinya 6
     # print(average_bit)
    
     selisih = [int(interpolated_sample[x]-embedded_sample[x]) for x in range(len(embedded_sample))]
-    # print(len(selisih))
+    len_payload = len(selisih) #panjang payload
+
     smoothed_payload = []
     number = 0
     flag = True
-    while flag == True:
+    inLen = True
+
+    while flag == True and inLen == True:
         mod, div, flag = get_div_mod(selisih, average_bit)
         smoothed_payload = np.append(smoothed_payload, mod)
         if flag == False:
             smoothed_payload = np.append(smoothed_payload, div)
         else:
             selisih = div
+
+        if len(smoothed_payload) + len_payload*2 > len(interpolated_sample):
+            inLen = False
+
         number += 1
     
-    # print(number+1,"jj")
+    # print(number+1,"jj", len_payload, len(smoothed_payload))
 
     # print(len(smoothed_payload))
     smoothed_sample = [(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
