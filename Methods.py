@@ -66,7 +66,7 @@ def embedding(payload_decimal, interpolated_sample):
         embedded.append(interpolated_sample[x] - payload_decimal[x])
     return embedded
 
-def smoothing(embedded_sample, interpolated_sample, bit):
+def smoothing(embedded_sample, interpolated_sample, bit, info_file):
     average_bit = 2 # aslinya 6
     # print(average_bit)
    
@@ -90,11 +90,10 @@ def smoothing(embedded_sample, interpolated_sample, bit):
             inLen = False
 
         number += 1
-    
-    # print(number+1,"jj", len_payload, len(smoothed_payload))
 
-    # print(len(smoothed_payload))
     smoothed_sample = [(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
+    
+    write_info(number, len_payload, info_file)
 
     return smoothed_sample
 
@@ -108,6 +107,13 @@ def get_div_mod(selisih, average_bit):
             flag = True
             break
     return mod, div, flag
+
+def write_info(number, len_payload, info_file):
+    os.makedirs(os.path.dirname(info_file), exist_ok=True)
+    info = open(info_file,"w+")
+    info.write(str(number)+'\n')
+    info.write(str(len_payload))
+    info.close()
 
 def combine(input_sampling, embed_data, data_interpolation):
     new_embed_data = [embed_data[x] if x < len(embed_data) else data_interpolation[x] for x in range (len(data_interpolation))]
@@ -133,3 +139,11 @@ def create_stego_audio(stego_data, filepath):
 
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     scp.write(filepath, 88200, stego_audio)
+
+############################################# Extract #############################################
+
+def divide_stego_sample(data):
+    cover_audio_data = [data[x] for x in range (len(data)) if x % 2 == 0]
+    stego_audio_data = [data[x] for x in range (len(data)) if x % 2 == 1]
+    return cover_audio_data, stego_audio_data
+

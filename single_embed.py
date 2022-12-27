@@ -13,10 +13,11 @@ from Methods import combine
 from Methods import create_stego_audio
 
 audio = '1'
-payload = '9'
+payload = '1'
 audio_file = 'dataset/Audio/data'+audio+'_mono.wav'
 payload_file = 'dataset/Payload/payload'+payload+'.txt'
 stego_audio = 'stego_audio/stego_audio'+audio+'_payload'+payload+'/stegoaudio.wav'
+info_file = 'stego_audio/stego_audio'+audio+'_payload'+payload+'/info.txt'
 
 #payload process
 binary_payload = read_payload(payload_file)
@@ -30,9 +31,8 @@ bit = fuzzifikasi(interpolated_sample, original_sample)
 processed_payload = payload_process(bit, binary_payload, interpolated_sample)
 decimal_payload = converting(processed_payload)
 embedded = embedding(decimal_payload, interpolated_sample)
-smoothed = smoothing(embedded, interpolated_sample,bit)
+smoothed = smoothing(embedded, interpolated_sample,bit,info_file)
 
 #create output
 stego_data = combine(original_sample, smoothed, interpolated_sample)
 create_stego_audio(stego_data, stego_audio)
-print(stego_audio)
