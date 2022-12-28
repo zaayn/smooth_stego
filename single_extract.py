@@ -8,7 +8,9 @@ from Methods import read_info
 from Methods import get_diffference
 from Methods import get_smoothed_payload
 from Methods import extracting
+from Methods import process_bit
 
+from Methods import get_payload_cover
 
 def main():
     audio = '1'
@@ -32,6 +34,8 @@ def main():
     # extracting
     differenced = get_diffference(embedded_sample, interpolated_sample, smooth, len_payload)
     smoothed_payload = get_smoothed_payload(differenced, len_payload)
-    extracted_payload = extracting(smoothed_payload, smooth, bit)
+    decimal_payload = extracting(smoothed_payload, smooth, bit)
+    converted_payload = process_bit(decimal_payload, bit) 
+    get_payload_cover(converted_payload, extracted_payload,original_sample, extracted_audio)
 
 main()

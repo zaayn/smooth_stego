@@ -70,6 +70,7 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
     average_bit = math.floor(math.log(np.mean(bit),2)) # aslinya 6
    
     selisih = [int(interpolated_sample[x]-embedded_sample[x]) for x in range(len(embedded_sample))]
+    print(selisih)
     len_payload = len(selisih) #panjang payload
 
     smoothed_payload = []
@@ -88,9 +89,9 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
 
         if len(smoothed_payload) + len_payload*2 > len(interpolated_sample):
             inLen = False
-
         number += 1
 
+    print(number, len(smoothed_payload)/9)
     smoothed_sample = [(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
     
     write_info(number, len_payload, info_file)
@@ -178,19 +179,39 @@ def get_smoothed_payload(selisih, length):
 
 def extracting(smoothed_payload, smooth, bit):
     average_bit = math.floor(math.log(np.mean(bit),2))
-    print(smooth,"dd")
-    while smooth-2 > 0:
+
+    print(smooth,len(smoothed_payload))
+    while smooth-2 > 0: #jika data ada 9 maka smoothing sebanyak 8 kali
         div = smoothed_payload[-1]
         mod = smoothed_payload[-2]
-        # print(div)
-        # print(mod)
 
         tmp = [(div[x] * average_bit) + mod[x] for x in range(len(div))]
         
         del smoothed_payload[-1]
         smoothed_payload[-1] = tmp
         smooth -= 1
-        # break
     
-    print(smoothed_payload[-1])
+    smoothed_payload = smoothed_payload[1]
+    return smoothed_payload
+
+def process_bit(desimal,bit):
+    payload = []
+    for x in range(len(desimal)):
+    
+        payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
+
+    translated_payload = ''.join(payload)
+    translated_payload = '\t'.join(translated_payload)
+    return translated_payload
+
+def get_payload_cover(byte_payload, payload_path, original_sample, audio_path):
+    os.makedirs(os.path.dirname(payload_path),exist_ok=True)
+    with open(payload_path, 'w+') as file:
+        file.write(byte_payload)
+        file.close()
+
+    unnormalize_data = np.subtract(original_sample,[32768])
+    new_data_sample = np.array(unnormalize_data,dtype=np.int16)
+    os.makedirs(os.path.dirname(audio_path),exist_ok=True)
+    scp.write(audio_path, 44100, new_data_sample)
 
