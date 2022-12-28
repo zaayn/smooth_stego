@@ -70,17 +70,16 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
     average_bit = math.floor(math.log(np.mean(bit),2)) # aslinya 6
    
     selisih = [int(interpolated_sample[x]-embedded_sample[x]) for x in range(len(embedded_sample))]
-    print(selisih)
     len_payload = len(selisih) #panjang payload
 
     smoothed_payload = []
     number = 0
     flag = True
     inLen = True
-
     while flag == True and inLen == True:
         mod, div, flag = get_div_mod(selisih, average_bit)
         smoothed_payload = np.append(smoothed_payload, mod)
+
         if flag == False:
             smoothed_payload = np.append(smoothed_payload, div)
             number += 1
@@ -90,9 +89,7 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
         if len(smoothed_payload) + len_payload*2 > len(interpolated_sample):
             inLen = False
         number += 1
-
-    print(number, len(smoothed_payload)/9)
-    smoothed_sample = [(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
+    smoothed_sample = [int(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
     
     write_info(number, len_payload, info_file)
 
@@ -180,11 +177,9 @@ def get_smoothed_payload(selisih, length):
 def extracting(smoothed_payload, smooth, bit):
     average_bit = math.floor(math.log(np.mean(bit),2))
 
-    print(smooth,len(smoothed_payload))
     while smooth-2 > 0: #jika data ada 9 maka smoothing sebanyak 8 kali
         div = smoothed_payload[-1]
         mod = smoothed_payload[-2]
-
         tmp = [(div[x] * average_bit) + mod[x] for x in range(len(div))]
         
         del smoothed_payload[-1]

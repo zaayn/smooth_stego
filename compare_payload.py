@@ -24,7 +24,7 @@ def read_number_data(file):
 
 def compare_data(data1, data2):
     hasil = 1
-    if len(data1) == len(data2):
+    if len(data1) != len(data2):
         print('panjang data1 = ', len(data1))
         print('panjang data2 = ', len(data2))
         
