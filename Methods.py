@@ -67,8 +67,7 @@ def embedding(payload_decimal, interpolated_sample):
     return embedded
 
 def smoothing(embedded_sample, interpolated_sample, bit, info_file):
-    average_bit = 2 # aslinya 6
-    # print(average_bit)
+    average_bit = math.floor(math.log(np.mean(bit),2)) # aslinya 6
    
     selisih = [int(interpolated_sample[x]-embedded_sample[x]) for x in range(len(embedded_sample))]
     len_payload = len(selisih) #panjang payload
@@ -83,6 +82,7 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
         smoothed_payload = np.append(smoothed_payload, mod)
         if flag == False:
             smoothed_payload = np.append(smoothed_payload, div)
+            number += 1
         else:
             selisih = div
 
@@ -146,4 +146,51 @@ def divide_stego_sample(data):
     cover_audio_data = [data[x] for x in range (len(data)) if x % 2 == 0]
     stego_audio_data = [data[x] for x in range (len(data)) if x % 2 == 1]
     return cover_audio_data, stego_audio_data
+
+def read_info(info_file):
+    file_info = open(info_file, "r")
+    count = 1
+    for line in file_info:
+        if count == 1:
+            line1 = format(line.strip())
+        if count == 2:
+            line2 = format(line.strip())
+        count += 1
+    file_info.close()
+    number = int(line1)
+    length = int(line2)
+    return number, length
+
+def get_diffference(embedded_sample, interpolated_sample, smooth, len_payload):
+    total_sample = smooth * len_payload
+    selisih = [int(interpolated_sample[x] - embedded_sample[x]) for x in range(total_sample)]
+    return selisih
+
+def get_smoothed_payload(selisih, length):
+    index = 0
+    segmented_list_payload = []
+    for x in range(len(selisih)):
+        if x % length == 0:
+            segmented_list_payload.append(selisih[index:index + length])
+            index = x
+    
+    return segmented_list_payload
+
+def extracting(smoothed_payload, smooth, bit):
+    average_bit = math.floor(math.log(np.mean(bit),2))
+    print(smooth,"dd")
+    while smooth-2 > 0:
+        div = smoothed_payload[-1]
+        mod = smoothed_payload[-2]
+        # print(div)
+        # print(mod)
+
+        tmp = [(div[x] * average_bit) + mod[x] for x in range(len(div))]
+        
+        del smoothed_payload[-1]
+        smoothed_payload[-1] = tmp
+        smooth -= 1
+        # break
+    
+    print(smoothed_payload[-1])
 
