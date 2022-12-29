@@ -13,9 +13,6 @@ def read_payload(file_payload):
     if(binary_data[0]!='1' and binary_data[0]!='0') and (binary_data[1]!='1' and binary_data[1]!='0'):
         binary_data = binary_data[2::]
 
-    # binary_data = list(open(file_payload))[0]
-    # binary_data = binary_data.split('\t')
-    # binary_data = [x.strip('ÿþ') for x in binary_data]
     return binary_data
 
 def read_number_data(file):

@@ -57,6 +57,7 @@ def payload_process(bit, binary_payload, interpolated_sample):
     return processed_payload
 
 def converting(data_binary):
+    print(data_binary,"j")
     data_decimal = [int(data_binary[x],2) if data_binary[x]!='X' and data_binary[x]!='' else 0 for x in range (len(data_binary))]
     return data_decimal
 
@@ -79,9 +80,11 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
     while flag == True and inLen == True:
         mod, div, flag = get_div_mod(selisih, average_bit)
         smoothed_payload = np.append(smoothed_payload, mod)
+        # print(mod[80:85])
 
         if flag == False:
             smoothed_payload = np.append(smoothed_payload, div)
+            # print(div[80:85])
             number += 1
         else:
             selisih = div
@@ -170,14 +173,15 @@ def get_smoothed_payload(selisih, length):
     for x in range(len(selisih)):
         if x % length == 0:
             segmented_list_payload.append(selisih[index:index + length])
-            index = x
-    
+        index += 1
+    # for x in range(len(segmented_list_payload)):
+    #     print(segmented_list_payload[x][80:85])
     return segmented_list_payload
 
 def extracting(smoothed_payload, smooth, bit):
     average_bit = math.floor(math.log(np.mean(bit),2))
 
-    while smooth-2 > 0: #jika data ada 9 maka smoothing sebanyak 8 kali
+    while smooth-1 > 0: #jika data ada 9 maka smoothing sebanyak 8 kali
         div = smoothed_payload[-1]
         mod = smoothed_payload[-2]
         tmp = [(div[x] * average_bit) + mod[x] for x in range(len(div))]
@@ -185,17 +189,21 @@ def extracting(smoothed_payload, smooth, bit):
         del smoothed_payload[-1]
         smoothed_payload[-1] = tmp
         smooth -= 1
-    
-    smoothed_payload = smoothed_payload[1]
+    smoothed_payload = smoothed_payload[0]
     return smoothed_payload
 
 def process_bit(desimal,bit):
     payload = []
+    length = 0
     for x in range(len(desimal)):
-    
-        payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
+        if x == len(desimal)-1:
+            payload.append(np.binary_repr(int(desimal[x])))
+        else:
+            payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
+            length += 1
 
     translated_payload = ''.join(payload)
+    print(translated_payload)
     translated_payload = '\t'.join(translated_payload)
     return translated_payload
 
