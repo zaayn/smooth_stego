@@ -28,6 +28,7 @@ def main():
             audio_file = folder_file_audio + 'data' + str(x) + '_mono.wav'
             payload_file = folder_file_payload + 'payload' + str(y) + '.txt'
             stego_audio = folder_stego_audio + 'stego_audio' + str(x) + '_payload' + str(y) +'/stegoaudio.wav'
+            info_file = folder_info + 'stego_audio' + str(x) + '_payload' + str(y) + '/info.txt'
 
             #payload process
             binary_payload = read_payload(payload_file)
@@ -41,7 +42,7 @@ def main():
             processed_payload = payload_process(bit, binary_payload, interpolated_sample)
             decimal_payload = converting(processed_payload)
             embedded = embedding(decimal_payload, interpolated_sample)
-            smoothed = smoothing(embedded, interpolated_sample,bit)
+            smoothed = smoothing(embedded, interpolated_sample,bit,info_file)
 
             #create output
             stego_data = combine(original_sample, smoothed, interpolated_sample)

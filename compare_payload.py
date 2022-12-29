@@ -24,7 +24,7 @@ def compare_data(data1, data2):
     if len(data1) != len(data2):
         print('panjang data1 = ', len(data1))
         print('panjang data2 = ', len(data2))
-        
+
         return 0
     else:
         miss_data = 0
@@ -45,8 +45,8 @@ def create_payload(translated_payload, filepath):
 
 def main():
 
-    original_payload = 'dataset/Payload/payload1.txt'
-    extract_payload = 'extracted/stego_audio1_payload1/payload.txt'
+    original_payload = 'dataset/Payload/payload2.txt'
+    extract_payload = 'extracted/stego_audio1_payload2/payload.txt'
 
     data_ori_payload = read_payload(original_payload)
     data_ext_payload = read_payload(extract_payload)

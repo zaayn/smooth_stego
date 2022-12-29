@@ -13,7 +13,7 @@ from Methods import combine
 from Methods import create_stego_audio
 
 audio = '1'
-payload = '1'
+payload = '2'
 audio_file = 'dataset/Audio/data'+audio+'_mono.wav'
 payload_file = 'dataset/Payload/payload'+payload+'.txt'
 stego_audio = 'stego_audio/stego_audio'+audio+'_payload'+payload+'/stegoaudio.wav'

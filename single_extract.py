@@ -14,7 +14,7 @@ from Methods import get_payload_cover
 
 def main():
     audio = '1'
-    payload = '1'
+    payload = '2'
 
     # init file
     stego_audio = 'stego_audio/stego_audio'+audio+'_payload'+payload+'/stegoaudio.wav'

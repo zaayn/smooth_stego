@@ -39,7 +39,7 @@ def fuzzifikasi(interpolated_sample, original_sample):
 
                 total = math.floor((up * selisih_up) + (low * selisih_down))
                 if total == 0:
-                    bit.append(0)
+                    bit.append(1)
                 else:
                     bit.append(math.floor(math.log(total,2)))
 
@@ -57,7 +57,6 @@ def payload_process(bit, binary_payload, interpolated_sample):
     return processed_payload
 
 def converting(data_binary):
-    print(data_binary,"j")
     data_decimal = [int(data_binary[x],2) if data_binary[x]!='X' and data_binary[x]!='' else 0 for x in range (len(data_binary))]
     return data_decimal
 
@@ -80,11 +79,9 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
     while flag == True and inLen == True:
         mod, div, flag = get_div_mod(selisih, average_bit)
         smoothed_payload = np.append(smoothed_payload, mod)
-        # print(mod[80:85])
 
         if flag == False:
             smoothed_payload = np.append(smoothed_payload, div)
-            # print(div[80:85])
             number += 1
         else:
             selisih = div
@@ -194,16 +191,15 @@ def extracting(smoothed_payload, smooth, bit):
 
 def process_bit(desimal,bit):
     payload = []
-    length = 0
     for x in range(len(desimal)):
         if x == len(desimal)-1:
             payload.append(np.binary_repr(int(desimal[x])))
         else:
             payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
-            length += 1
+            # if len(np.binary_repr(int(desimal[x]),width=bit[x])) != bit[x]:
+            #     print(desimal[x], np.binary_repr(int(desimal[x]),width=bit[x]), bit[x], x)
 
     translated_payload = ''.join(payload)
-    print(translated_payload)
     translated_payload = '\t'.join(translated_payload)
     return translated_payload
 

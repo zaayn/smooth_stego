@@ -107,8 +107,8 @@ def print_excel(data_mse, data_snr, data_psnr, filename):
     excel.save(filename)
 
 def main():
-    audio = '2'
-    payload = '11'
+    audio = '1'
+    payload = '2'
 
     file_audio = 'dataset/Audio/data'+audio+'_mono.wav'
     filename = 'audio_clone/data_clone_audio'+audio+'.wav'
