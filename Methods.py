@@ -192,12 +192,14 @@ def extracting(smoothed_payload, smooth, bit):
 def process_bit(desimal,bit):
     payload = []
     for x in range(len(desimal)):
-        if x == len(desimal)-1:
-            payload.append(np.binary_repr(int(desimal[x])))
-        else:
-            payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
-            # if len(np.binary_repr(int(desimal[x]),width=bit[x])) != bit[x]:
-            #     print(desimal[x], np.binary_repr(int(desimal[x]),width=bit[x]), bit[x], x)
+        if bit[x] != 0:
+            
+            if x == len(desimal)-1:
+                payload.append(np.binary_repr(int(desimal[x])))
+            else:
+                payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
+                # if len(np.binary_repr(int(desimal[x]),width=bit[x])) != bit[x]:
+                #     print(desimal[x], np.binary_repr(int(desimal[x]),width=bit[x]), bit[x], x)
 
     translated_payload = ''.join(payload)
     translated_payload = '\t'.join(translated_payload)

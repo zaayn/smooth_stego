@@ -24,7 +24,6 @@ def compare_data(data1, data2):
     if len(data1) != len(data2):
         print('panjang data1 = ', len(data1))
         print('panjang data2 = ', len(data2))
-
         return 0
     else:
         miss_data = 0
@@ -36,7 +35,7 @@ def compare_data(data1, data2):
                 hasil = 0
     return hasil
 
-def create_payload(translated_payload, filepath):
+def create_payload(translated_payload, filepath): 
     os.makedirs(os.path.dirname(filepath),exist_ok=True)
     with open(filepath, 'w') as file:
         file.write(translated_payload)
@@ -45,17 +44,24 @@ def create_payload(translated_payload, filepath):
 
 def main():
 
-    original_payload = 'dataset/Payload/payload1.txt'
-    extract_payload = 'extracted/stego_audio1_payload1/payload.txt'
+    total_file_payload = 11
+    total_file_cover_audio = 15
+    for x in range(1,total_file_cover_audio+1):
+        for y in range(1,total_file_payload+1):
+            
+            original_payload = 'dataset/Payload/payload' + str(y) + '.txt'
+            extract_payload = 'extracted/stego_audio' + str(x) + '_payload' + str(y) + '/payload.txt'
 
-    data_ori_payload = read_payload(original_payload)
-    data_ext_payload = read_payload(extract_payload)
-    
-    hasil_payload = compare_data(data_ori_payload, data_ext_payload)
+            data_ori_payload = read_payload(original_payload)
+            data_ext_payload = read_payload(extract_payload)
+            
+            hasil_payload = compare_data(data_ori_payload, data_ext_payload)
 
-    if hasil_payload == 0:
-        print('Gagal diekstraksi dengan benar')
-    else:
-        print("Persis")
+            if hasil_payload == 0:
+                print('Extracted Payload dari Stego_audio'+str(x)+'_payload'+str(y)+'.wav GAGAL di Ekstraksi')
+                return
+            else:
+                print('Extracted Payload dari Stego_audio'+str(x)+'_payload'+str(y)+'.wav SUKSES diekstraksi')
+                print("-------------------------------------------------------------------------")
 
 main()
