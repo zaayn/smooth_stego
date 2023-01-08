@@ -70,6 +70,7 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
     average_bit = math.floor(math.log(np.mean(bit),2)) # aslinya 6
    
     selisih = [int(interpolated_sample[x]-embedded_sample[x]) for x in range(len(embedded_sample))]
+    selisih2 = selisih.copy()
     len_payload = len(selisih) #panjang payload
 
     smoothed_payload = []
@@ -91,7 +92,7 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
         number += 1
     smoothed_sample = [int(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
     
-    write_info(number, len_payload, info_file)
+    write_info(number, len_payload, selisih2, info_file)
 
     return smoothed_sample
 
@@ -106,11 +107,12 @@ def get_div_mod(selisih, average_bit):
             break
     return mod, div, flag
 
-def write_info(number, len_payload, info_file):
+def write_info(number, len_payload, selisih, info_file):
     os.makedirs(os.path.dirname(info_file), exist_ok=True)
     info = open(info_file,"w+")
     info.write(str(number)+'\n')
-    info.write(str(len_payload))
+    info.write(str(len_payload)+'\n')
+    info.write(str(selisih))
     info.close()
 
 def combine(input_sampling, embed_data, data_interpolation):
@@ -153,11 +155,14 @@ def read_info(info_file):
             line1 = format(line.strip())
         if count == 2:
             line2 = format(line.strip())
+        if count == 3:
+            line3 = format(line.strip())
         count += 1
     file_info.close()
     number = int(line1)
     length = int(line2)
-    return number, length
+    diff = line3
+    return number, length, diff
 
 def get_diffference(embedded_sample, interpolated_sample, smooth, len_payload):
     total_sample = smooth * len_payload
@@ -215,4 +220,27 @@ def get_payload_cover(byte_payload, payload_path, original_sample, audio_path):
     new_data_sample = np.array(unnormalize_data,dtype=np.int16)
     os.makedirs(os.path.dirname(audio_path),exist_ok=True)
     scp.write(audio_path, 44100, new_data_sample)
+
+############################################# Testing #############################################
+def decimal_payload_check(embedding_distance, extracted_distance):
+    # preprocessing
+    embedding_distance = embedding_distance[1:]
+    embedding_distance = embedding_distance[:-1]
+    embedding_distance = embedding_distance.split(", ")
+    embedding_distance = [int(x) for x in embedding_distance]
+    
+    error = False
+    if len(embedding_distance) != len(extracted_distance):
+        print("length embedding distance = ", len(embedding_distance))
+        print("length extracted distance = ", len(extracted_distance))
+        error = True
+    else:
+        for x in range(len(embedding_distance)):
+            if embedding_distance[x] != extracted_distance[x]:
+                print("index = ", x)
+                print("embedding distance ", embedding_distance[x], type(embedding_distance[x]))
+                print("extracted distance ", extracted_distance[x], type(extracted_distance[x]))
+                error = True
+    print(error)
+
 
