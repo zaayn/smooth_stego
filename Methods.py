@@ -39,7 +39,7 @@ def fuzzifikasi(interpolated_sample, original_sample):
 
                 total = math.floor((up * selisih_up) + (low * selisih_down))
                 if total == 0:
-                    bit.append(1)
+                    bit.append(0)
                 else:
                     bit.append(math.floor(math.log(total,2)))
 
@@ -48,13 +48,16 @@ def fuzzifikasi(interpolated_sample, original_sample):
 def payload_process(bit, binary_payload, interpolated_sample):
     index = 0
     processed_payload = []
-
     for x in bit:
         if(index < len(binary_payload)):
-            processed_payload.append(binary_payload[index:index+x])
-            index += x
-    
-    return processed_payload
+            if x == 0:
+                processed_payload.append("X")
+                continue
+            else:
+                processed_payload.append(binary_payload[index:index+x])
+                index += x
+    last_bit = len(processed_payload[-1])
+    return processed_payload, last_bit
 
 def converting(data_binary):
     data_decimal = [int(data_binary[x],2) if data_binary[x]!='X' and data_binary[x]!='' else 0 for x in range (len(data_binary))]
@@ -66,7 +69,7 @@ def embedding(payload_decimal, interpolated_sample):
         embedded.append(interpolated_sample[x] - payload_decimal[x])
     return embedded
 
-def smoothing(embedded_sample, interpolated_sample, bit, info_file):
+def smoothing(embedded_sample, interpolated_sample, bit, info_file, tmp, last_bit): #delete tmp
     average_bit = math.floor(math.log(np.mean(bit),2)) # aslinya 6
    
     selisih = [int(interpolated_sample[x]-embedded_sample[x]) for x in range(len(embedded_sample))]
@@ -92,7 +95,7 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file):
         number += 1
     smoothed_sample = [int(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
     
-    write_info(number, len_payload, selisih2, info_file)
+    write_info(number, len_payload, selisih2, info_file, tmp, last_bit)
 
     return smoothed_sample
 
@@ -107,12 +110,14 @@ def get_div_mod(selisih, average_bit):
             break
     return mod, div, flag
 
-def write_info(number, len_payload, selisih, info_file):
+def write_info(number, len_payload, selisih, info_file, tmp, last_bit): #delete tmp
     os.makedirs(os.path.dirname(info_file), exist_ok=True)
     info = open(info_file,"w+")
     info.write(str(number)+'\n')
     info.write(str(len_payload)+'\n')
-    info.write(str(selisih))
+    info.write(str(selisih)+'\n')
+    info.write(str(tmp)+'\n')
+    info.write(str(last_bit))
     info.close()
 
 def combine(input_sampling, embed_data, data_interpolation):
@@ -157,12 +162,18 @@ def read_info(info_file):
             line2 = format(line.strip())
         if count == 3:
             line3 = format(line.strip())
+        if count ==4:
+            line4 = format(line.strip())
+        if count == 5:
+            line5 = format(line.strip())
         count += 1
     file_info.close()
     number = int(line1)
     length = int(line2)
     diff = line3
-    return number, length, diff
+    segpy = line4 # segmented payload
+    last_bit = line5
+    return number, length, diff, segpy, last_bit
 
 def get_diffference(embedded_sample, interpolated_sample, smooth, len_payload):
     total_sample = smooth * len_payload
@@ -194,21 +205,20 @@ def extracting(smoothed_payload, smooth, bit):
     smoothed_payload = smoothed_payload[0]
     return smoothed_payload
 
-def process_bit(desimal,bit):
+def process_bit(desimal,bit, last_bit):
     payload = []
+    last_bit = int(last_bit)
     for x in range(len(desimal)):
-        if bit[x] != 0:
-            
-            if x == len(desimal)-1:
-                payload.append(np.binary_repr(int(desimal[x])))
-            else:
-                payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
-                # if len(np.binary_repr(int(desimal[x]),width=bit[x])) != bit[x]:
-                #     print(desimal[x], np.binary_repr(int(desimal[x]),width=bit[x]), bit[x], x)
-
+        if bit[x] == 0:
+            # payload.append("X")
+            continue
+        elif x == len(desimal)-1:
+            payload.append(np.binary_repr(int(desimal[x]),width=last_bit))
+        else:
+            payload.append(np.binary_repr(int(desimal[x]),width=bit[x]))
     translated_payload = ''.join(payload)
     translated_payload = '\t'.join(translated_payload)
-    return translated_payload
+    return translated_payload, payload
 
 def get_payload_cover(byte_payload, payload_path, original_sample, audio_path):
     os.makedirs(os.path.dirname(payload_path),exist_ok=True)
@@ -222,25 +232,51 @@ def get_payload_cover(byte_payload, payload_path, original_sample, audio_path):
     scp.write(audio_path, 44100, new_data_sample)
 
 ############################################# Testing #############################################
-def decimal_payload_check(embedding_distance, extracted_distance):
-    # preprocessing
+# compare decimal payload
+def decimal_payload_check(embedding_distance, extracted_distance, payload, segmented, bit):
+    # preprocessing decimal payload
     embedding_distance = embedding_distance[1:]
     embedding_distance = embedding_distance[:-1]
     embedding_distance = embedding_distance.split(", ")
     embedding_distance = [int(x) for x in embedding_distance]
+
+    #preprocessing segmented payload
+    segmented = segmented[1:]
+    segmented = segmented[:-1]
+    segmented = segmented.split(", ")
+    data = [] # new segmented
+    for x in range(len(segmented)):
+        tmp = segmented[x]
+        tmp = tmp[1:]
+        tmp = tmp[:-1]
+        data.append(tmp)
     
-    error = False
+    error1 = False
     if len(embedding_distance) != len(extracted_distance):
         print("length embedding distance = ", len(embedding_distance))
         print("length extracted distance = ", len(extracted_distance))
-        error = True
+        error1 = True
     else:
         for x in range(len(embedding_distance)):
             if embedding_distance[x] != extracted_distance[x]:
                 print("index = ", x)
                 print("embedding distance ", embedding_distance[x], type(embedding_distance[x]))
                 print("extracted distance ", extracted_distance[x], type(extracted_distance[x]))
-                error = True
-    print(error)
+                error1 = True
+    
+    if(error1 == False):
+        error2 = False
+        if len(payload) != len(data):
+            print("error", len(payload), len(data))
+            error2 = True
+        else:
+            for x in range(len(payload)):
+                if payload[x] != data[x]:
+                    print(x,payload[x],data[x], bit[x])
+                    error2 = True
+        
+        print(error2)
+                
+
 
 

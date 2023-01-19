@@ -39,10 +39,10 @@ def main():
             bit = fuzzifikasi(interpolated_sample, original_sample)
 
             #embedding process
-            processed_payload = payload_process(bit, binary_payload, interpolated_sample)
+            processed_payload, last_bit = payload_process(bit, binary_payload, interpolated_sample)
             decimal_payload = converting(processed_payload)
             embedded = embedding(decimal_payload, interpolated_sample)
-            smoothed = smoothing(embedded, interpolated_sample,bit,info_file)
+            smoothed = smoothing(embedded, interpolated_sample,bit,info_file,processed_payload, last_bit)
 
             #create output
             stego_data = combine(original_sample, smoothed, interpolated_sample)

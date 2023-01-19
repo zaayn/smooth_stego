@@ -16,7 +16,7 @@ from Methods import decimal_payload_check
 
 def main():
     audio = '1'
-    payload = '4'
+    payload = '9'
 
     # init file
     stego_audio = 'stego_audio/stego_audio'+audio+'_payload'+payload+'/stegoaudio.wav'
@@ -31,16 +31,17 @@ def main():
     bit = fuzzifikasi(interpolated_sample, original_sample)
 
     # read file info
-    smooth, len_payload, diff = read_info(info_file)
+    smooth, len_payload, diff, segmented_payload, last_bit = read_info(info_file)
     
     # extracting
     differenced = get_diffference(embedded_sample, interpolated_sample, smooth, len_payload)
     smoothed_payload = get_smoothed_payload(differenced, len_payload)
     decimal_payload = extracting(smoothed_payload, smooth, bit)
-    converted_payload = process_bit(decimal_payload, bit) 
+    converted_payload, payload = process_bit(decimal_payload, bit, last_bit) # delete payload
     get_payload_cover(converted_payload, extracted_payload,original_sample, extracted_audio)
 
     # testing
-    decimal_payload_check(diff, decimal_payload)
+    result = decimal_payload_check(diff, decimal_payload, payload, segmented_payload, bit)
+
 
 main()
