@@ -89,9 +89,10 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file, tmp, last_bi
             number += 1
         else:
             selisih = div
-
-        if len(smoothed_payload) + len_payload*2 > len(interpolated_sample):
-            inLen = False
+            if len(smoothed_payload) + len_payload*2 > len(interpolated_sample):
+                smoothed_payload = np.append(smoothed_payload, div)
+                number += 1
+                inLen = False
         number += 1
     smoothed_sample = [int(interpolated_sample[x] - smoothed_payload[x]) for x in range(len(smoothed_payload))]
     
