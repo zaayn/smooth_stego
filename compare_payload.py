@@ -44,8 +44,8 @@ def create_payload(translated_payload, filepath):
     return
 
 def main():
-    audio = '1'
-    payload = '9'
+    audio = '9'
+    payload = '7'
 
     original_payload = 'dataset/Payload/payload'+payload+'.txt'
     extract_payload = 'extracted/stego_audio'+audio+'_payload'+payload+'/payload.txt'

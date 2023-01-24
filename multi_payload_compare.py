@@ -46,7 +46,6 @@ def main():
 
     total_file_payload = 11
     total_file_cover_audio = 15
-    error =[]
     for x in range(1,total_file_cover_audio+1):
         for y in range(1,total_file_payload+1):
             
@@ -59,9 +58,7 @@ def main():
             hasil_payload = compare_data(data_ori_payload, data_ext_payload)
             if hasil_payload == 0:
                 print('Extracted Payload dari Stego_audio'+str(x)+'_payload'+str(y)+'.wav GAGAL di Ekstraksi')
-                error.append(str(x)+'-'+str(y))
             else:
                 print('Extracted Payload dari Stego_audio'+str(x)+'_payload'+str(y)+'.wav SUKSES diekstraksi')
                 print("-------------------------------------------------------------------------")
-    print(error, len(error))
 main()
