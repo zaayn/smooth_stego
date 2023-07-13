@@ -95,9 +95,9 @@ def smoothing(embedded_sample, interpolated_sample, bit, info_file, last_bit):
         number += 1
     smoothed_sample = [abs(int(interpolated_sample[x] - smoothed_payload[x])) for x in range(len(smoothed_payload))]
     
-    for x in range(len(smoothed_sample)):
-        if smoothed_sample[x] < 0:
-            print(x, smoothed_sample[x], interpolated_sample[x], smoothed_payload[x]) #output 42830 -1 0.0 1.0
+    # for x in range(len(smoothed_sample)):
+    #     if smoothed_sample[x] < 0:
+    #         print(x, smoothed_sample[x], interpolated_sample[x], smoothed_payload[x]) #output 42830 -1 0.0 1.0
     
     write_info(number, len_payload, last_bit, info_file)
 

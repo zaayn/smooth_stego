@@ -38,6 +38,7 @@ def main():
             interpolated_sample = interpolation_linear(original_sample)
             bit = fuzzifikasi(interpolated_sample, original_sample)
 
+
             #embedding process
             processed_payload, last_bit = payload_process(bit, binary_payload, interpolated_sample)
             decimal_payload = converting(processed_payload)
@@ -47,6 +48,7 @@ def main():
             #create output
             stego_data = combine(original_sample, smoothed, interpolated_sample)
             create_stego_audio(stego_data, stego_audio)
-            print('Create stego_audio'+ str(x) +'_payload'+ str(y) +'.wav SUKSES')
+            # print('Create stego_audio'+ str(x) +'_payload'+ str(y) +'.wav SUKSES')
+        print(len(interpolated_sample))
 
 main()
