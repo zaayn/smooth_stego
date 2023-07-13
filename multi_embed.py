@@ -49,6 +49,5 @@ def main():
             stego_data = combine(original_sample, smoothed, interpolated_sample)
             create_stego_audio(stego_data, stego_audio)
             # print('Create stego_audio'+ str(x) +'_payload'+ str(y) +'.wav SUKSES')
-        print(len(interpolated_sample))
 
 main()
